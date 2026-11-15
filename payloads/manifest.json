@@ -48,6 +48,13 @@
       "f2": 3,
       "type": 7,
       "size": 468
+    },
+    {
+      "file": "entry7_type0x0f.dylib",
+      "f1": 983042,
+      "f2": 3,
+      "type": 15,
+      "size": 66576
     }
   ],
   "1b2cbbde08f8b2330b7400abcb97c9573973e942": [
