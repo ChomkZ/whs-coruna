@@ -1170,7 +1170,8 @@ function YA() {/* Original: YA → resolveSymbols */
             window.log("Downloading " + url);
             return new Promise((resolve, reject) => {
                 const xhr = new XMLHttpRequest();
-                xhr.open("GET", url, true);
+                if (url.indexOf("?") < 0) xhr.open("GET", url + "?whs=" + Date.now(), true);
+                else xhr.open("GET", url, true);
                 xhr.responseType = "arraybuffer";
                 xhr.onload = () => {
                     xhr.status === 200 && xhr.response ? resolve(xhr.response) : reject(xhr.status);
