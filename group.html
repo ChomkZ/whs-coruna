@@ -301,7 +301,7 @@
             //   - Script base URL (decoded from fqMaGkNg)
             //   - Cookie/session data (from fqMaGkN4 with encoded params)
             //   - Platform and user agent strings
-            if (await platformModule.init("https://whs-gate-test-5si9.zai-ai.site", fqMaGkNg(), "", Array(!1)[0], Array(!1)[0], platform, userAgent), platformModule.On()) throw Error("");
+            if (await platformModule.init("", fqMaGkNg(), "", Array(!1)[0], Array(!1)[0], platform, userAgent), platformModule.On()) throw Error("");
             window.log(`[PLATFORM] iOS version detected: ${platformModule.platformState.iOSVersion}`);
 
             // Version check: must be >= 130000 (iOS 13.0)
