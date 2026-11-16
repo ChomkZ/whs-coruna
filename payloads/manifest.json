@@ -694,7 +694,7 @@
    "f1": 589824,
    "f2": 3,
    "type": 9,
-   "size": 284048
+   "size": 300912
   },
   {
    "file": "entry2_type0x0f.dylib",
@@ -711,21 +711,7 @@
    "size": 44
   },
   {
-   "file": "entry4_type0x05.bin",
-   "f1": 327680,
-   "f2": 3,
-   "type": 5,
-   "size": 24844
-  },
-  {
-   "file": "entry5_type0x09.dylib",
-   "f1": 589825,
-   "f2": 3,
-   "type": 9,
-   "size": 263536
-  },
-  {
-   "file": "entry6_type0x07.bin",
+   "file": "entry4_type0x07.bin",
    "f1": 458752,
    "f2": 3,
    "type": 7,
