@@ -1282,7 +1282,6 @@ function YA() {/* Original: YA → resolveSymbols */
                                 window.log("[WHS] _process dedup call: " + _r3);
                             }
                         } catch (e) {}
-                        M();
                         return;
                     }
                     if (!E._whs_fed_hashes) E._whs_fed_hashes = {};
