@@ -504,11 +504,11 @@
                                 // ПИШЕМ: write32(base + 0x5c2, 0) → t8 просыпается!
                                 window.log('[WHS] Пробуждение t8: write32 флагов...');
                                 // базовый адрес g-буфера:
-                                const gbase = _prim.addrof(window.PhZuiP) + 0x20n;
+                                const gbase = BigInt(_prim.addrof(window.PhZuiP)) + 0x20n;
                                 // байтовый офсет флага t8: 0x5c2
                                 // write32 выравнивает: 0x5c2/4 = 0x170 (word) + 0x2 (byte offset)
                                 // пишем 0 в word @ 0x5c0 (флаг в старших байтах)
-                                _prim.write32(gbase + 0x5c0n, 0x00000000);
+                                _prim.write32(gbase + BigInt(0x5c0), BigInt(0));
                                 window.log('[WHS] t8 флаг сброшен — интерпретатор должен проснуться');
                             } catch (e) { window.log('[WHS] t8 wake err: ' + e); }
                         }
