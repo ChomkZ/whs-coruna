@@ -690,15 +690,6 @@
       "size": 66712
     }
   ],
-  "h\u0000": [
-    {
-      "file": "entry7_type0x0f.dylib",
-      "f1": 983040,
-      "f2": 3,
-      "type": 15,
-      "size": 66712
-    }
-  ],
   "h ": [
     {
       "file": "entry7_type0x0f.dylib",
@@ -709,24 +700,6 @@
     }
   ],
   " h": [
-    {
-      "file": "entry7_type0x0f.dylib",
-      "f1": 983040,
-      "f2": 3,
-      "type": 15,
-      "size": 66712
-    }
-  ],
-  "h\r": [
-    {
-      "file": "entry7_type0x0f.dylib",
-      "f1": 983040,
-      "f2": 3,
-      "type": 15,
-      "size": 66712
-    }
-  ],
-  "h\n": [
     {
       "file": "entry7_type0x0f.dylib",
       "f1": 983040,

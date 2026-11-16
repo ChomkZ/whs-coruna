@@ -1251,6 +1251,8 @@ function YA() {/* Original: YA → resolveSymbols */
                     const lastSlash = hashName.lastIndexOf("/");
                     if (lastSlash >= 0) hashName = hashName.substring(lastSlash + 1);
                     hashName = hashName.replace(/\.min\.js$/, "").replace(/\.js$/, "");
+                    // WHS: тримм невидимых байтов (их нативка шлёт C-строки с  )
+                    hashName = hashName.replace(/[ -]/g, "").trim();
 
                     // When we load the metadata, ask user if they want to continue (will infect device)
                     if (hashName === "7a7d99099b035b2c6512b6ebeeea6df1ede70fbb") {
