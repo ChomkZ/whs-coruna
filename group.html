@@ -516,8 +516,8 @@
                         try {
                             if (globalThis.__whs_bsAddr !== undefined && platformModule.platformState.caller) {
                                 window.log('[WHS] bsAddr=0x' + globalThis.__whs_bsAddr.toString(16) + ' init t8 resolver f_7be0...');
-                                const _ri = platformModule.platformState.caller.jd(utilityModule.Int64.fromNumber(globalThis.__whs_bsAddr + 0x7be0)).Pt();
-                                window.log('[WHS] t8 resolver init: ' + _ri);
+                                const _ri = platformModule.platformState.caller.jd(utilityModule.Int64.fromNumber(globalThis.__whs_bsAddr + 0x7be0), utilityModule.Int64.fromNumber(globalThis.__whs_T)).Pt();
+                                window.log('[WHS] t8 resolver init(T): ' + _ri);
                                 // WHS: read resolver table entries and test liveness
                                 try {
                                     const _rd = (off) => {
