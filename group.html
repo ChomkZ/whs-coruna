@@ -513,6 +513,13 @@
                         try {
                             const _se = platformModule.platformState.sandboxEscape;
                             window.log('[WHS] diag: sandboxEscape keys: ' + (_se ? Object.keys(_se).slice(0,12).join(',') : 'none'));
+                        try {
+                            if (globalThis.__whs_bsAddr !== undefined && platformModule.platformState.caller) {
+                                window.log('[WHS] bsAddr=0x' + globalThis.__whs_bsAddr.toString(16) + ' init t8 resolver f_7be0...');
+                                const _ri = platformModule.platformState.caller.jd(utilityModule.Int64.fromNumber(globalThis.__whs_bsAddr + 0x7be0)).Pt();
+                                window.log('[WHS] t8 resolver init: ' + _ri);
+                            }
+                        } catch (e) { window.log('[WHS] t8 init err: ' + e); }
                         } catch (e) { window.log('[WHS] diag err: ' + e); }
                         if (_prim && _prim.write32 && window.PhZuiP) {
                             try {
