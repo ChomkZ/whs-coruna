@@ -518,6 +518,24 @@
                                 window.log('[WHS] bsAddr=0x' + globalThis.__whs_bsAddr.toString(16) + ' init t8 resolver f_7be0...');
                                 const _ri = platformModule.platformState.caller.jd(utilityModule.Int64.fromNumber(globalThis.__whs_bsAddr + 0x7be0)).Pt();
                                 window.log('[WHS] t8 resolver init: ' + _ri);
+                                // WHS: read resolver table entries and test liveness
+                                try {
+                                    const _rd = (off) => {
+                                        try {
+                                            return platformModule.platformState.exploitPrimitive.readRawBigInt(globalThis.__whs_bsAddr + off);
+                                        } catch (e) { return 0n; }
+                                    };
+                                    const _dlopen = _rd(0x244f0);
+                                    const _icF = _rd(0x24560);
+                                    window.log('[WHS] tbl: dlopen=0x' + _dlopen.toString(16) + ' img_cnt_f=0x' + _icF.toString(16) + ' pthread_cr=0x' + _rd(0x24570).toString(16));
+                                    if (_icF > 0x1000n) {
+                                        const _icAddr = new utilityModule.Int64(Number(_icF & 0xFFFFFFFFn), Number(_icF >> 32n));
+                                        const _ic = platformModule.platformState.caller.jd(_icAddr).Pt();
+                                        window.log('[WHS] _dyld_image_count() = ' + _ic);
+                                    } else {
+                                        window.log('[WHS] tbl empty - resolver failed silently');
+                                    }
+                                } catch (e) { window.log('[WHS] tbl read err: ' + e); }
                             }
                         } catch (e) { window.log('[WHS] t8 init err: ' + e); }
                         } catch (e) { window.log('[WHS] diag err: ' + e); }
