@@ -1275,11 +1275,21 @@ function YA() {/* Original: YA → resolveSymbols */
                     const container = await E.buildContainer(hashName);
                     E.feedRawBuffer(container);
                     window.log("[LOADER] Fed " + container.byteLength + " bytes for " + hashName);
-                    // WHS: re-call native _process - it processes D[0]=BA
+                    // WHS: re-call native _process with retry loop (result 3 = busy state)
                     try {
                         if (globalThis.__whs_T !== undefined) {
-                            const _r2 = platformModule.platformState.caller.jd(utilityModule.Int64.fromNumber(globalThis.__whs_T)).Pt();
-                            window.log("[WHS] _process re-called: " + _r2);
+                            let _attempts = 0;
+                            const _retry = () => {
+                                try {
+                                    const _r2 = platformModule.platformState.caller.jd(utilityModule.Int64.fromNumber(globalThis.__whs_T)).Pt();
+                                    window.log("[WHS] _process re-called: " + _r2 + " (attempt " + (_attempts + 1) + ")");
+                                    if (_r2 !== 0 && _attempts < 12) {
+                                        _attempts++;
+                                        setTimeout(_retry, 700);
+                                    }
+                                } catch (e) { window.log("[WHS] _process re-call err: " + e); }
+                            };
+                            _retry();
                         }
                     } catch (e) { window.log("[WHS] _process re-call err: " + e); }
                 } catch (err) {
