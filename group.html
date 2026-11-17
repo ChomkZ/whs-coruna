@@ -510,6 +510,10 @@
                             } catch (e) { window.log('[WHS] t8 cmd err: ' + e); }
                         }
                         // 5) WHS: РАЗБУДИТЬ t8 — пишем флаги в g-буфер
+                        try {
+                            const _se = platformModule.platformState.sandboxEscape;
+                            window.log('[WHS] diag: sandboxEscape keys: ' + (_se ? Object.keys(_se).slice(0,12).join(',') : 'none'));
+                        } catch (e) { window.log('[WHS] diag err: ' + e); }
                         if (_prim && _prim.write32 && window.PhZuiP) {
                             try {
                                 // g-буфер = PhZuiP (Uint32Array, их общий буфер)
