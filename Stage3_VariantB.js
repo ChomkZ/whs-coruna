@@ -1272,20 +1272,6 @@ function YA() {/* Original: YA → resolveSymbols */
                     } catch (e) {}
                     // Fetch decrypted F00DBEEF container from payloads/ directory
                     window.log("[LOADER] Loading payload: " + hashName);
-                    // WHS: dedup - native re-requests same blob after feed;
-                    // skip re-download, just re-trigger _process
-                    if (E._whs_fed_hashes && E._whs_fed_hashes[hashName]) {
-                        window.log("[WHS] dedup: already fed " + hashName + ", re-trigger only");
-                        try {
-                            if (globalThis.__whs_T !== undefined) {
-                                const _r3 = platformModule.platformState.caller.jd(utilityModule.Int64.fromNumber(globalThis.__whs_T)).Pt();
-                                window.log("[WHS] _process dedup call: " + _r3);
-                            }
-                        } catch (e) {}
-                        return;
-                    }
-                    if (!E._whs_fed_hashes) E._whs_fed_hashes = {};
-                    E._whs_fed_hashes[hashName] = 1;
                     const container = await E.buildContainer(hashName);
                     E.feedRawBuffer(container);
                     window.log("[LOADER] Fed " + container.byteLength + " bytes for " + hashName);
