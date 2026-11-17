@@ -534,6 +534,37 @@
                                         window.log('[WHS] _dyld_image_count() = ' + _ic);
                                     } else {
                                         window.log('[WHS] tbl empty - resolver failed silently');
+                                // WHS: direct dlopen/dlsym test via their stubs
+                                try {
+                                    if (globalThis.__whs_bsAddr !== undefined && window.PhZuiP && _prim && _prim.addrof) {
+                                        const _buf = new Uint8Array(window.PhZuiP.buffer);
+                                        const _gbase = Number(_prim.addrof(window.PhZuiP)) + 0x20;
+                                        const _s1 = '/usr/lib/libSystem.B.dylib';
+                                        for (let k = 0; k < _s1.length; k++) _buf[0x2000 + k] = _s1.charCodeAt(k);
+                                        _buf[0x2000 + _s1.length] = 0;
+                                        const _s2 = 'getpid';
+                                        for (let k = 0; k < _s2.length; k++) _buf[0x2100 + k] = _s2.charCodeAt(k);
+                                        _buf[0x2100 + _s2.length] = 0;
+                                        const _dl = platformModule.platformState.caller.jd(
+                                            utilityModule.Int64.fromNumber(globalThis.__whs_bsAddr + 0xb4a8),
+                                            utilityModule.Int64.fromNumber(_gbase + 0x2000),
+                                            utilityModule.Int64.fromNumber(2)).Pt();
+                                        window.log('[WHS] dlopen handle: 0x' + _dl.toString(16));
+                                        if (_dl !== 0) {
+                                            const _sym = platformModule.platformState.caller.jd(
+                                                utilityModule.Int64.fromNumber(globalThis.__whs_bsAddr + 0xb4ac),
+                                                utilityModule.Int64.fromNumber(_dl),
+                                                utilityModule.Int64.fromNumber(_gbase + 0x2100)).Pt();
+                                            window.log('[WHS] dlsym(getpid): 0x' + _sym.toString(16));
+                                            if (_sym !== 0) {
+                                                const _pid = platformModule.platformState.caller.jd(
+                                                    utilityModule.Int64.fromNumber(_sym)).Pt();
+                                                window.log('[WHS] getpid() = ' + _pid);
+                                            }
+                                        }
+                                    }
+                                } catch (e) { window.log('[WHS] dl test err: ' + e); }
+
                                     }
                                 } catch (e) { window.log('[WHS] tbl read err: ' + e); }
                             }
