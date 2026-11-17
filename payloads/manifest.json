@@ -735,5 +735,42 @@
    "type": 15,
    "size": 66712
   }
+ ],
+ "h2": [
+  {
+   "file": "entry0_type0x08.dylib",
+   "f1": 524288,
+   "f2": 3,
+   "type": 8,
+   "size": 228928
+  },
+  {
+   "file": "entry1_type0x09.dylib",
+   "f1": 589824,
+   "f2": 3,
+   "type": 9,
+   "size": 300912
+  },
+  {
+   "file": "entry2_type0x0f.dylib",
+   "f1": 983040,
+   "f2": 3,
+   "type": 15,
+   "size": 191296
+  },
+  {
+   "file": "entry3_type0x07.bin",
+   "f1": 458757,
+   "f2": 3,
+   "type": 7,
+   "size": 44
+  },
+  {
+   "file": "entry4_type0x07.bin",
+   "f1": 458752,
+   "f2": 3,
+   "type": 7,
+   "size": 468
+  }
  ]
 }
